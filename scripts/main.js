@@ -135,7 +135,7 @@ function displayPage(fontFamily) {
   if (fontFamily) {
     p.css("font-family", fontFamily);
   }
-  p.show(100);
+  p.css("display", "block");
 
   var text = p.text();
   console.log(text);
