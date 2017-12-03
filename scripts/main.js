@@ -94,15 +94,16 @@ function loadPage(pageIndex) {
     dataType: "text",
     success: function success(data) {
       console.log("Loaded %s", pageName);
-      var p = $(".page");
-      p.css("display", "none");
-      p.text(data);
+      //var p = $(".page");
+      //p.css("display", "none");
+      //p.text(data);
+
+      loadRandomFont(data);
     }
   });
-  loadRandomFont();
 }
 
-function loadRandomFont() {
+function loadRandomFont(pageText) {
   if (gFonts.length == 0) {
     return;
   }
@@ -120,26 +121,25 @@ function loadRandomFont() {
     fontactive: function fontactive(familyName, fvd) {
       console.log("Loaded font %s", familyName);
 
-      displayPage(familyName);
+      displayPage(pageText, familyName);
     },
     inactive: function inactive() {
       // fallback
       // failed to load fonts, just display the message
-      displayPage();
+      displayPage(pageText);
     }
   });
 }
 
-function displayPage(fontFamily) {
+function displayPage(pageText, fontFamily) {
   var p = $(".page");
   if (fontFamily) {
     p.css("font-family", fontFamily);
   }
-  p.css("display", "block");
+  p.text(pageText);
 
-  var text = p.text();
-  console.log(text);
-  speak(text);
+  console.log(pageText);
+  speak(pageText);
 }
 
 function speak(text) {
