@@ -95,7 +95,7 @@ function loadPage(pageIndex) {
     success: function success(data) {
       console.log("Loaded %s", pageName);
       var p = $(".page");
-      p.hide(200);
+      p.css("display", "none");
       p.text(data);
     }
   });
