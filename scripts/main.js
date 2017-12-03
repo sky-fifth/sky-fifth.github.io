@@ -94,8 +94,9 @@ function loadPage(pageIndex) {
     dataType: "text",
     success: function success(data) {
       console.log("Loaded %s", pageName);
-      $(".page").hide();
-      $(".page").text(data);
+      var p = $(".page");
+      p.hide();
+      p.text(data);
     }
   });
   loadRandomFont();
@@ -130,12 +131,13 @@ function loadRandomFont() {
 }
 
 function displayPage(fontFamily) {
+  var p = $(".page");
   if (fontFamily) {
-    $(".page").css("font-family", fontFamily);
+    p.css("font-family", fontFamily);
   }
-  $(".page").show();
+  p.show();
 
-  var text = $(".page").text();
+  var text = p.text();
   console.log(text);
   speak(text);
 }
