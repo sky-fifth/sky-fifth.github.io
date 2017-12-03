@@ -95,7 +95,7 @@ function loadPage(pageIndex) {
     success: function success(data) {
       console.log("Loaded %s", pageName);
       var p = $(".page");
-      p.hide();
+      p.hide(200);
       p.text(data);
     }
   });
@@ -135,7 +135,7 @@ function displayPage(fontFamily) {
   if (fontFamily) {
     p.css("font-family", fontFamily);
   }
-  p.show();
+  p.show(100);
 
   var text = p.text();
   console.log(text);
