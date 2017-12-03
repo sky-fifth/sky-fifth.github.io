@@ -1,1 +1,53 @@
-*,:after,:before{box-sizing:border-box}html{font-family:Helvetica,Arial,sans-serif;font-size:100%;background:#fff;color:#000}#page-wrapper{padding:1em}#support-msg-fonts{display:none}p.page{font-size:40pt;margin:0;white-space:pre-wrap}
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 100%;
+  background: white;
+  color: black;
+}
+
+#page-wrapper {
+  padding: 1em;
+}
+
+
+#support-msg-fonts {
+  display: none;
+}
+
+
+p.page {
+  font-size: 40pt;
+  margin: 0;
+  white-space: pre-wrap
+}
+
+
+/*
+html.wf-loading #support-msg-fonts {
+  display: block;
+}
+html.wf-active #support-msg-fonts {
+  display: block;
+}
+
+
+html.wf-loading #support-msg-fonts .wf-loading {
+  display: block;
+}
+
+
+html.wf-loading #support-msg-fonts .wf-active {
+  display: none;
+}
+
+html.wf-active #support-msg-fonts .wf-loading {
+  display: block;
+}
+
+html.wf-active #support-msg-fonts .wf-loading {
+  display: none;
+} */

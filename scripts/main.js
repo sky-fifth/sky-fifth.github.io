@@ -1,1 +1,227 @@
-"use strict";function loadFirstPage(){gPageIndex=0,loadPage(gPageIndex)}function loadNextPage(){gPageIndex++,gPageIndex>=gTotalPagesCount&&(gPageIndex=0),gPageIndex<0&&(gPageIndex=gTotalPagesCount-1),loadPage(gPageIndex)}function loadPreviousPage(){gPageIndex--,gPageIndex>=gTotalPagesCount&&(gPageIndex=0),gPageIndex<0&&(gPageIndex=gTotalPagesCount-1),loadPage(gPageIndex)}function loadPage(e){var n="page"+e+".txt";gSpeech&&(gSpeech.onend=null),window.speechSynthesis.cancel(),gSpeech=null,$.ajax({url:"scripts/"+n,cache:!1,dataType:"text",success:function(e){$(".page").hide(),$(".page").text(e)}}),loadRandomFont()}function loadRandomFont(){if(0!=gFonts.length){gFontsIndex==gFonts.length&&(gFontsIndex=0);var e=gFonts[gFontsIndex];gFontsIndex++,WebFont.load({google:{families:[e+":400:latin,latin-ext"]},fontactive:function(e,n){displayPage(e)},inactive:function(){displayPage()}})}}function displayPage(e){e&&$(".page").css("font-family",e),$(".page").show();var n=$(".page").text();speak(n)}function speak(e){var n=new SpeechSynthesisUtterance;n.text=e,n.volume=.8,n.rate=1,n.pitch=1,n.voice=gVoice,n.onend=function(e){setTimeout(loadNextPage,550)},n.onerror=function(e){},n.onpause=function(e){},n.onresume=function(e){},gSpeech=n,window.speechSynthesis.speak(n)}function shuffle(e){for(var n,a,o=e.length;0!==o;)a=Math.floor(Math.random()*o),o-=1,n=e[o],e[o]=e[a],e[a]=n;return e}function loadVoices(){var e=speechSynthesis.getVoices();if(e&&0!=e.length){var n=e.filter(function(e){return"Laura"==e.name})[0];n||(n=e[0]),gVoice=n}}function playOrPause(){var e=window.speechSynthesis;e.speaking&&(e.paused?e.resume():e.pause())}var _KEYCODE_LEFT_ARROW=37,_KEYCODE_RIGHT_ARROW=39,_KEYCODE_SPACEBAR=32,gFonts=[],gFontsIndex=0,gTotalPagesCount=5,gPageIndex=0,gVoice=null,gSpeech=null;$(document).ready(function(e){$.getJSON("scripts/fonts.json",function(e){var n=shuffle(e);gFonts=n,loadFirstPage()}),$("body").keydown(function(e){switch(e.keyCode){case _KEYCODE_LEFT_ARROW:loadPreviousPage();break;case _KEYCODE_RIGHT_ARROW:loadNextPage();break;case _KEYCODE_SPACEBAR:e.preventDefault(),playOrPause()}})}),loadVoices(),window.speechSynthesis.onvoiceschanged=function(e){loadVoices()};
+"use strict";
+
+var _KEYCODE_LEFT_ARROW = 37;
+var _KEYCODE_RIGHT_ARROW = 39;
+var _KEYCODE_SPACEBAR = 32;
+
+var gFonts = [];
+var gFontsIndex = 0;
+
+var gTotalPagesCount = 5;
+var gPageIndex = 0;
+
+var gVoice = null;
+var gSpeech = null;
+
+$(document).ready(function (e) {
+  $.getJSON('scripts/fonts.json', function (fonts) {
+    var shuffledFonts = shuffle(fonts);
+    gFonts = shuffledFonts;
+
+    loadFirstPage();
+    //loadRandomFont();
+  });
+
+  $("body").keydown(function (e) {
+    switch (e.keyCode) {
+      case _KEYCODE_LEFT_ARROW:
+        loadPreviousPage();
+        //loadRandomFont();
+        break;
+
+      case _KEYCODE_RIGHT_ARROW:
+        loadNextPage();
+        //loadRandomFont();
+        break;
+
+      case _KEYCODE_SPACEBAR:
+        e.preventDefault();
+        playOrPause();
+        break;
+    }
+  });
+});
+
+loadVoices();
+window.speechSynthesis.onvoiceschanged = function (e) {
+  loadVoices();
+};
+
+function loadFirstPage() {
+  gPageIndex = 0;
+  loadPage(gPageIndex);
+}
+
+function loadNextPage() {
+  gPageIndex++;
+
+  if (gPageIndex >= gTotalPagesCount) {
+    gPageIndex = 0;
+  }
+  if (gPageIndex < 0) {
+    gPageIndex = gTotalPagesCount - 1;
+  }
+
+  loadPage(gPageIndex);
+}
+
+function loadPreviousPage() {
+  gPageIndex--;
+
+  if (gPageIndex >= gTotalPagesCount) {
+    gPageIndex = 0;
+  }
+  if (gPageIndex < 0) {
+    gPageIndex = gTotalPagesCount - 1;
+  }
+
+  loadPage(gPageIndex);
+}
+
+function loadPage(pageIndex) {
+  var pageName = "page" + pageIndex + ".txt";
+
+  // disable existing onend event
+  // and cancel speaking
+  if (gSpeech) {
+    gSpeech.onend = null;
+  }
+  window.speechSynthesis.cancel();
+  gSpeech = null;
+  $.ajax({
+    url: "scripts/" + pageName,
+    cache: false,
+    dataType: "text",
+    success: function success(data) {
+      console.log("Loaded %s", pageName);
+      $(".page").hide();
+      $(".page").text(data);
+    }
+  });
+  loadRandomFont();
+}
+
+function loadRandomFont() {
+  if (gFonts.length == 0) {
+    return;
+  }
+  if (gFontsIndex == gFonts.length) {
+    gFontsIndex = 0;
+  }
+
+  var f = gFonts[gFontsIndex];
+  gFontsIndex++;
+
+  WebFont.load({
+    google: {
+      families: [f + ":400:latin,latin-ext"]
+    },
+    fontactive: function fontactive(familyName, fvd) {
+      console.log("Loaded font %s", familyName);
+
+      displayPage(familyName);
+    },
+    inactive: function inactive() {
+      // fallback
+      // failed to load fonts, just display the message
+      displayPage();
+    }
+  });
+}
+
+function displayPage(fontFamily) {
+  if (fontFamily) {
+    $(".page").css("font-family", fontFamily);
+  }
+  $(".page").show();
+
+  var text = $(".page").text();
+  console.log(text);
+  speak(text);
+}
+
+function speak(text) {
+  var speech = new SpeechSynthesisUtterance();
+  speech.text = text;
+  speech.volume = 0.8;
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  speech.voice = gVoice;
+
+  // speech.onboundary = function(event) {
+  //   console.log(event.name + ' boundary reached after ' + event.elapsedTime + 'ms.');
+  // }
+  speech.onend = function (event) {
+    console.log('Finished speaking.');
+    //console.log('Utterance has finished being spoken after ' + event.elapsedTime + 'ms.');
+    //loadNextPage();
+    setTimeout(loadNextPage, 550);
+  };
+  speech.onerror = function (event) {
+    console.log('Error speaking: %s', event.error);
+  };
+  speech.onpause = function (event) {
+    console.log('Speech paused.');
+  };
+  speech.onresume = function (event) {
+    console.log('Speech resumed.');
+  };
+
+  gSpeech = speech;
+  window.speechSynthesis.speak(speech);
+}
+
+function shuffle(array) {
+  var currentIndex = array.length;
+  var temporaryValue;
+  var randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+function loadVoices() {
+  // Fetch the available voices.
+  var voices = speechSynthesis.getVoices();
+  if (!voices || voices.length == 0) {
+    return;
+  }
+
+  var voice = voices.filter(function (voice) {
+    // macOS languages:
+    // sk-SK: Laura
+    // cs-CZ: Zuzana
+
+    return voice.name == 'Laura';
+  })[0];
+
+  if (!voice) {
+    voice = voices[0];
+  }
+
+  gVoice = voice;
+  console.log('We will use "%s" voice.', voice.name);
+}
+
+function playOrPause() {
+  var synth = window.speechSynthesis;
+  if (synth.speaking) {
+    if (synth.paused) {
+      synth.resume();
+    } else {
+      synth.pause();
+    }
+  }
+}
