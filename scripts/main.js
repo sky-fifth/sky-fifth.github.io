@@ -7,37 +7,44 @@ var _KEYCODE_SPACEBAR = 32;
 var gFonts = [];
 var gFontsIndex = 0;
 
-var gTotalPagesCount = 5;
+var gPages = [];
 var gPageIndex = 0;
 
 var gVoice = null;
 var gSpeech = null;
 
 $(document).ready(function (e) {
-  $.getJSON('scripts/fonts.json', function (fonts) {
-    var shuffledFonts = shuffle(fonts);
-    gFonts = shuffledFonts;
+  $.get({
+    url: "scripts/TEXT_CISTY_HOMO_FRAUDIS.txt",
+    cache: false,
+    dataType: "text",
+    success: function success(allText) {
+      gPages = allText.split("===\n");
+      console.log("Loaded %i pages.", gPages.length);
 
-    loadFirstPage();
-    //loadRandomFont();
-  });
+      $("body").keydown(function (e) {
+        switch (e.keyCode) {
+          case _KEYCODE_LEFT_ARROW:
+            loadPreviousPage();
+            break;
 
-  $("body").keydown(function (e) {
-    switch (e.keyCode) {
-      case _KEYCODE_LEFT_ARROW:
-        loadPreviousPage();
-        //loadRandomFont();
-        break;
+          case _KEYCODE_RIGHT_ARROW:
+            loadNextPage();
+            break;
 
-      case _KEYCODE_RIGHT_ARROW:
-        loadNextPage();
-        //loadRandomFont();
-        break;
+          case _KEYCODE_SPACEBAR:
+            e.preventDefault();
+            playOrPause();
+            break;
+        }
+      });
 
-      case _KEYCODE_SPACEBAR:
-        e.preventDefault();
-        playOrPause();
-        break;
+      $.getJSON('scripts/fonts.json', function (fonts) {
+        var shuffledFonts = shuffle(fonts);
+        gFonts = shuffledFonts;
+
+        loadFirstPage();
+      });
     }
   });
 });
@@ -55,11 +62,11 @@ function loadFirstPage() {
 function loadNextPage() {
   gPageIndex++;
 
-  if (gPageIndex >= gTotalPagesCount) {
+  if (gPageIndex >= gPages.length) {
     gPageIndex = 0;
   }
   if (gPageIndex < 0) {
-    gPageIndex = gTotalPagesCount - 1;
+    gPageIndex = gPages.length - 1;
   }
 
   loadPage(gPageIndex);
@@ -68,11 +75,11 @@ function loadNextPage() {
 function loadPreviousPage() {
   gPageIndex--;
 
-  if (gPageIndex >= gTotalPagesCount) {
+  if (gPageIndex >= gPages.length) {
     gPageIndex = 0;
   }
   if (gPageIndex < 0) {
-    gPageIndex = gTotalPagesCount - 1;
+    gPageIndex = gPages.length - 1;
   }
 
   loadPage(gPageIndex);
@@ -88,19 +95,9 @@ function loadPage(pageIndex) {
   }
   window.speechSynthesis.cancel();
   gSpeech = null;
-  $.ajax({
-    url: "scripts/" + pageName,
-    cache: false,
-    dataType: "text",
-    success: function success(data) {
-      console.log("Loaded %s", pageName);
-      //var p = $(".page");
-      //p.css("display", "none");
-      //p.text(data);
 
-      loadRandomFont(data);
-    }
-  });
+  var pageText = gPages[pageIndex];
+  loadRandomFont(pageText);
 }
 
 function loadRandomFont(pageText) {
@@ -138,7 +135,6 @@ function displayPage(pageText, fontFamily) {
   }
   p.text(pageText);
 
-  console.log(pageText);
   speak(pageText);
 }
 
@@ -156,19 +152,17 @@ function speak(text) {
   // }
   speech.onend = function (event) {
     console.log('Finished speaking.');
-    //console.log('Utterance has finished being spoken after ' + event.elapsedTime + 'ms.');
-    //loadNextPage();
     setTimeout(loadNextPage, 550);
   };
   speech.onerror = function (event) {
     console.log('Error speaking: %s', event.error);
   };
-  speech.onpause = function (event) {
-    console.log('Speech paused.');
-  };
-  speech.onresume = function (event) {
-    console.log('Speech resumed.');
-  };
+  // speech.onpause = function(event) {
+  //   console.log('Speech paused.');
+  // }
+  // speech.onresume = function(event) {
+  //   console.log('Speech resumed.');
+  // }
 
   gSpeech = speech;
   window.speechSynthesis.speak(speech);
